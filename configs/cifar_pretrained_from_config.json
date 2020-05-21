@@ -4,18 +4,19 @@
     },
     "data_loader": {
 	"name": "cifar_data_loader.CifarDataLoader",
-	"batch_size": 64
+	"batch_size": 64,
+	"preprocessing_function": "resnet50.preprocess_input"
     },
     "model":{
 	"name": "cifar_pretrained_model.CifarPretrainedModel",
 	"learning_rate": 0.0001,
-	"optimizer": "RMSprop",
+	"optimizer": "rmsprop",
 	"backbone": "resnet50.ResNet50",
-	"pooling": "avg"
+	"pooling": "max"
     },
     "trainer":{
 	"name": "cifar_trainer.CifarModelTrainer",
-	"num_epochs": 4,
+	"num_epochs": 1,
 	"verbose_training": true
     },
     "callbacks":{
