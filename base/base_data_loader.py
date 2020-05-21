@@ -7,3 +7,9 @@ class BaseDataLoader(object):
 
     def get_test_data(self):
         raise NotImplementedError
+
+    def get_train_flow(self):
+        raise NotImplementedError
+
+    def get_test_flow(self):
+        raise NotImplementedError

@@ -21,8 +21,8 @@ def main():
         model = factory.create("models."+config.model.name)(config)
 
         print('Create the trainer')
-        trainer = factory.create("trainers."+config.trainer.name)(model.model, data_loader.get_train_data(), config)
-
+        trainer = factory.create("trainers."+config.trainer.name)(model.model, data_loader, config)
+        
         print('Start training the model.')
         trainer.train()
 

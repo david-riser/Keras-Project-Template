@@ -1,11 +1,12 @@
-from base.base_trainer import BaseTrain
 import os
-from keras.callbacks import ModelCheckpoint, TensorBoard
+
+from base.base_trainer import BaseTrain
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 
-class SimpleMnistModelTrainer(BaseTrain):
+class CifarModelTrainer(BaseTrain):
     def __init__(self, model, data, config):
-        super(SimpleMnistModelTrainer, self).__init__(model, data, config)
+        super(CifarModelTrainer, self).__init__(model, data, config)
         self.callbacks = []
         self.loss = []
         self.acc = []
@@ -25,27 +26,12 @@ class SimpleMnistModelTrainer(BaseTrain):
             )
         )
 
-        self.callbacks.append(
-            TensorBoard(
-                log_dir=self.config.callbacks.tensorboard_log_dir,
-                write_graph=self.config.callbacks.tensorboard_write_graph,
-            )
-        )
-
-        if hasattr(self.config,"comet_api_key"):
-            from comet_ml import Experiment
-            experiment = Experiment(api_key=self.config.comet_api_key, project_name=self.config.exp_name)
-            experiment.disable_mp()
-            experiment.log_multiple_params(self.config)
-            self.callbacks.append(experiment.get_keras_callback())
-
     def train(self):
         history = self.model.fit(
-            self.data[0], self.data[1],
+            x=self.data.get_train_flow(),
+            validation_data=self.data.get_test_data(),
             epochs=self.config.trainer.num_epochs,
             verbose=self.config.trainer.verbose_training,
-            batch_size=self.config.trainer.batch_size,
-            validation_split=self.config.trainer.validation_split,
             callbacks=self.callbacks,
         )
         self.loss.extend(history.history['loss'])

@@ -1,0 +1,26 @@
+{
+    "exp": {
+	"name": "cifar_from_config"
+    },
+    "data_loader": {
+	"name": "cifar_data_loader.CifarDataLoader",
+	"batch_size": 64
+    },
+    "model":{
+	"name": "cifar_model.CifarModel",
+	"learning_rate": 0.001,
+	"optimizer": "adam"
+    },
+    "trainer":{
+	"name": "cifar_trainer.CifarModelTrainer",
+	"num_epochs": 20,
+	"verbose_training": true
+    },
+    "callbacks":{
+	"checkpoint_monitor": "val_loss",
+	"checkpoint_mode": "min",
+	"checkpoint_save_best_only": true,
+	"checkpoint_save_weights_only": true,
+	"checkpoint_verbose": true
+    }
+}

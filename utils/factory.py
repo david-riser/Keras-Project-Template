@@ -10,6 +10,7 @@ def create(cls):
         print('getattr '+class_name)
         cls_instance = getattr(somemodule, class_name)
         print(cls_instance)
+
     except Exception as err:
         print("Creating directories error: {0}".format(err))
         exit(-1)
