@@ -4,21 +4,21 @@ from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 class CifarDataLoader(BaseDataLoader):
-
     def __init__(self, config):
         super(CifarDataLoader, self).__init__(config)
         (self.X_train, self.y_train), (self.X_test, self.y_test) = cifar10.load_data()
         self.X_train = self.X_train.reshape((-1, 32, 32, 3))
         self.X_test = self.X_test.reshape((-1, 32, 32, 3))
-
-        self.X_train = self.X_train.astype('float') / 255.
-        self.X_test = self.X_test.astype('float') / 255.
+        self.X_train = self.X_train.astype('float')
+        self.X_test = self.X_test.astype('float')
 
         if 'preprocessing_function' in self.config.data_loader.toDict():
             self.preprocess = create("tensorflow.keras.applications.{}".format(
-                self.config.data_loader.preprocessing_function)))
+                self.config.data_loader.preprocessing_function))
         else:
             self.preprocess = None
+            self.X_train /= 255.
+            self.X_test /= 255.
             
         self.train_gen = ImageDataGenerator(preprocessing_function=self.preprocess)
         self.train_flow = self.train_gen.flow(
@@ -34,8 +34,9 @@ class CifarDataLoader(BaseDataLoader):
 
         # Apply preprocessing to the test set
         if self.preprocess:
+            print("Applying preprocessing to test set.")
             self.X_test = self.preprocess(self.X_test)
-
+            
     def get_train_flow(self):
         return self.train_flow
 

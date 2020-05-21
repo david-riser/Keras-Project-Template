@@ -16,7 +16,7 @@
     },
     "trainer":{
 	"name": "cifar_trainer.CifarModelTrainer",
-	"num_epochs": 1,
+	"num_epochs": 10,
 	"verbose_training": true
     },
     "callbacks":{
