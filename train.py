@@ -23,9 +23,16 @@ def main():
         print('Create the trainer')
         trainer = factory.create("trainers."+config.trainer.name)(model.model, data_loader, config)
         
+
+        print('Creating evaluator')
+        evaluator = factory.create("evaluators." + config.evaluator.name)(model.model, data_loader, config)
+
         print('Start training the model.')
         trainer.train()
 
+        print('Evaluating...')
+        evaluator.evaluate()
+        
     except Exception as e:
         print(e)
         sys.exit(1)

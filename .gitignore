@@ -113,3 +113,6 @@ experiments/
 datasets/
 
 .idea/
+
+# Emacs
+*~
