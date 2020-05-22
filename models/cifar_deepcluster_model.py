@@ -72,7 +72,7 @@ class CifarDeepClusterModel(BaseModel):
         outputs = ClusteringLayer(
             n_clusters=self.config.model.n_clusters,
             name='clustering_layer',
-            input_shape=2048)(self.backbone.output)
+            input_shape=(2048,))(self.backbone.output)
 
         print("[DEBUG] Setup clustering layer.")
         # Setup the clustering model.

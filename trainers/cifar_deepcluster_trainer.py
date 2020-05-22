@@ -1,9 +1,9 @@
 import os
-from base.base_trainer import BaseTrainer
+from base.base_trainer import BaseTrain
 from sklearn.cluster import MiniBatchKMeans
 
 
-class CifarDeepClusterTrainer(BaseTrainer):
+class CifarDeepClusterTrainer(BaseTrain):
 
     def __init__(self, model, data, config):
         super(CifarDeepClusterTrainer, self).__init__(model, data, config)
@@ -29,7 +29,10 @@ class CifarDeepClusterTrainer(BaseTrainer):
 
         for epoch in range(self.config.trainer.kmeans_epochs):
             for batch in range(self.config.trainer.kmeans_batches_per_epoch):
-                self.kmeans.partial_fit(next(self.data.get_train_flow()))
+                (x_batch, y_batch) = next(self.data.get_train_flow())
+                self.kmeans.partial_fit(
+                    self.model.backbone.predict(x_batch)
+                )
 
         self.model.get_layer("clustering_layer").set_weights(
             [self.kmeans.cluster_centroids_]
