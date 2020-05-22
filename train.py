@@ -29,8 +29,6 @@ def main():
             evaluators.append(factory.create(
                 "evaluators." + evaluator.name
             )(model.model, data_loader, evaluator))
-             
-        #evaluator = factory.create("evaluators." + config.evaluator.name)(model.model, data_loader, config)
 
         print('Start training the model.')
         trainer.train()
