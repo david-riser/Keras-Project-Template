@@ -14,27 +14,27 @@ class CifarEvaluator(BaseEvaluator):
         
     def evaluate(self):
 
-        if self.config.evaluator.samples > len(self.data.y_test):
-            self.config.evaluator.samples = len(self.data.y_test)
+        if self.config.samples > len(self.data.y_test):
+            self.config.samples = len(self.data.y_test)
 
-        plots_per_page = self.config.evaluator.ncols * self.config.evaluator.nrows
-        total_pages = self.config.evaluator.samples // plots_per_page
+        plots_per_page = self.config.ncols * self.config.nrows
+        total_pages = self.config.samples // plots_per_page
         colors = { i:np.random.randint(0, 255, 3) for i in np.unique(self.data.y_test) }
         print(colors)
         
-        with PdfPages(self.config.evaluator.output_name) as pdf:
+        with PdfPages(self.config.output_name) as pdf:
             fig, axs = plt.subplots(
                 figsize=(8, 11),
-                nrows=self.config.evaluator.nrows,
-                ncols=self.config.evaluator.ncols,
+                nrows=self.config.nrows,
+                ncols=self.config.ncols,
                 sharex=True, sharey=True,
-                dpi=self.config.evaluator.dpi
+                dpi=self.config.dpi
             )
             fig.subplots_adjust(wspace=0, hspace=0)
 
             indices = np.random.choice(
                 np.arange(len(self.data.X_test)),
-                self.config.evaluator.samples,
+                self.config.samples,
                 replace=False
             )
             preds = self.model.predict(self.data.X_test)
@@ -54,8 +54,8 @@ class CifarEvaluator(BaseEvaluator):
                         i // plots_per_page, total_pages
                     ))
                     
-                row = (pad - 1) // self.config.evaluator.ncols
-                col = (pad - 1) % self.config.evaluator.ncols
+                row = (pad - 1) // self.config.ncols
+                col = (pad - 1) % self.config.ncols
     
                 # Plot an image there and remove axis
                 # ticks if they exist to unblock the

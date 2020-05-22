@@ -5,14 +5,13 @@ from utils import factory
 import sys
 
 def main():
-    # capture the config path from the run arguments
-    # then process the json configuration fill
+
     try:
         args = get_args()
         config = process_config(args.config)
 
         # create the experiments dirs
-        create_dirs([config.callbacks.tensorboard_log_dir, config.callbacks.checkpoint_dir])
+        create_dirs([config.callbacks.checkpoint_dir])
 
         print('Create the data generator.')
         data_loader = factory.create("data_loader."+config.data_loader.name)(config)
@@ -24,14 +23,21 @@ def main():
         trainer = factory.create("trainers."+config.trainer.name)(model.model, data_loader, config)
         
 
-        print('Creating evaluator')
-        evaluator = factory.create("evaluators." + config.evaluator.name)(model.model, data_loader, config)
+        print('Loading evaluators')
+        evaluators = []
+        for evaluator in config.evaluators:
+            evaluators.append(factory.create(
+                "evaluators." + evaluator.name
+            )(model.model, data_loader, evaluator))
+             
+        #evaluator = factory.create("evaluators." + config.evaluator.name)(model.model, data_loader, config)
 
         print('Start training the model.')
         trainer.train()
 
         print('Evaluating...')
-        evaluator.evaluate()
+        for evaluator in evaluators:
+            evaluator.evaluate()
         
     except Exception as e:
         print(e)

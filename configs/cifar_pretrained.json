@@ -26,12 +26,14 @@
 	"checkpoint_save_weights_only": true,
 	"checkpoint_verbose": true
     },
-    "evaluator":{
-	"name": "cifar_evaluator.CifarEvaluator",
-	"output_name": "/home/ubuntu/cifar_test_images.pdf",
-	"nrows": 6,
-	"ncols": 5,
-	"samples": 320,
-	"dpi": 100
-    }
+    "evaluators":[
+	{
+	    "name": "cifar_evaluator.CifarEvaluator",
+	    "output_name": "/home/ubuntu/cifar_test_images.pdf",
+	    "nrows": 6,
+	    "ncols": 5,
+	    "samples": 320,
+	    "dpi": 100
+	}
+    ]
 }
