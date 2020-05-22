@@ -22,7 +22,6 @@ def main():
         print('Create the trainer')
         trainer = factory.create("trainers."+config.trainer.name)(model.model, data_loader, config)
         
-
         print('Loading evaluators')
         evaluators = []
         for evaluator in config.evaluators:

@@ -20,17 +20,22 @@ class CifarDeepClusterTrainer(BaseTrainer):
         # First initialize the model cluster centroids.  This is
         # done with kmeans.  Since the dataset it large, we use
         # mini-batch kmeans. 
+        print("[INFO] Initializing cluster centroids w/ Kmeans (mini-batch).")
         if self.config.data_loader.batch_size < self.config.model.n_clusters:
             print("[FATAL] Mini-batch KMeans requires a batch size at least as large as the number of clusters.")
             exit()
 
         self.kmeans = MiniBatchKMeans(n_clusters=self.config.model.n_clusters)
 
-        for epoch in self.config.trainer.kmeans_epochs:
-            for batch in self.config.trainer.kmeans_batches_per_epoch:
+        for epoch in range(self.config.trainer.kmeans_epochs):
+            for batch in range(self.config.trainer.kmeans_batches_per_epoch):
                 self.kmeans.partial_fit(next(self.data.get_train_flow()))
-        
-        # Now start doing the model training
+
+        self.model.get_layer("clustering_layer").set_weights(
+            [self.kmeans.cluster_centroids_]
+        )
+
+        print("[INFO] Done!  Starting the training.")
         update_interval = int(np.ceil(self.config.trainer.batches / self.config.trainer.target_updates))
         if update_interval == 0:
             update_interval = 1
@@ -39,7 +44,7 @@ class CifarDeepClusterTrainer(BaseTrainer):
     
         kld_loss = []
         loss = np.inf
-        for ite in range(int(self.config.trainer.batches)):
+        for ite in range(self.config.trainer.batches):
 
             if ite % update_interval == 0:
             

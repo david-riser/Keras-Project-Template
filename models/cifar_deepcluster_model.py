@@ -2,7 +2,7 @@ from base.base_model import BaseModel
 from utils.factory import create
 from tensorflow.keras import backend as K
 from tensorflow.keras import Model
-
+from tensorflow.keras.layers import Dense, Layer
 
 class ClusteringLayer(Layer):
     """ Clustering layer. """
@@ -45,9 +45,9 @@ class ClusteringLayer(Layer):
         return input_shape[0], self.n_clusters
 
     def get_config(self):
-        config = {'n_clusters': self.n_clusters}
+        layer_config = {'n_clusters': self.n_clusters}
         base_config = super(ClusteringLayer, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+        return dict(list(base_config.items()) + list(layer_config.items()))
 
 
 class CifarDeepClusterModel(BaseModel):
@@ -57,6 +57,8 @@ class CifarDeepClusterModel(BaseModel):
         self.model_builder = create("tensorflow.keras.applications.{}".format(
             self.config.model.backbone
         ))
+
+        print("[DEBUG] Building model.")
         self.build_model()
 
     def build_model(self):
@@ -66,15 +68,13 @@ class CifarDeepClusterModel(BaseModel):
             pooling=self.config.model.pooling,
             include_top=False
         )
-
-        x = Dense(2048, activation='relu')(
-            self.backbone.output
-        )
+        print("[DEBUG] Setup backbone.")
         outputs = ClusteringLayer(
             n_clusters=self.config.model.n_clusters,
             name='clustering_layer',
-            input_shape=2048)(x)
+            input_shape=2048)(self.backbone.output)
 
+        print("[DEBUG] Setup clustering layer.")
         # Setup the clustering model.
         self.model = Model(inputs=self.backbone.input, outputs=outputs)
         self.model.compile(
