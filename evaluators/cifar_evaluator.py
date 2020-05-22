@@ -37,9 +37,14 @@ class CifarEvaluator(BaseEvaluator):
                 self.config.samples,
                 replace=False
             )
-            preds = self.model.predict(self.data.X_test)
+            preds = self.model.model.predict(self.data.X_test)
             preds = np.argmax(preds, axis=1)
             
+            # We want the data to be as it should look
+            # this will reload the data without applying
+            # the preprocessing.
+            self.data.load()
+        
             plot_order = np.argsort(preds)[np.sort(indices)]
             for i, index in enumerate(plot_order):
                 pad = 1 + i % plots_per_page
@@ -62,7 +67,6 @@ class CifarEvaluator(BaseEvaluator):
                 # figures and make them nicely sit
                 # next to each other.
                 img = self.data.X_test[index]
-                img *= 255
                 x = self.color_pad(
                     img,
                     colors[self.data.y_test[index][0]]

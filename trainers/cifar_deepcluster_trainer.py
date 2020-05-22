@@ -1,4 +1,6 @@
+import numpy as np
 import os
+
 from base.base_trainer import BaseTrain
 from sklearn.cluster import MiniBatchKMeans
 
@@ -11,7 +13,7 @@ class CifarDeepClusterTrainer(BaseTrain):
     def init_callbacks(self):
         pass
         
-    def clustering_target_distribution(self):
+    def clustering_target_distribution(self, q):
         weight = q ** 2 / q.sum(0)
         return (weight.T / weight.sum(1)).T
         
@@ -34,8 +36,8 @@ class CifarDeepClusterTrainer(BaseTrain):
                     self.model.backbone.predict(x_batch)
                 )
 
-        self.model.get_layer("clustering_layer").set_weights(
-            [self.kmeans.cluster_centroids_]
+        self.model.model.get_layer("clustering_layer").set_weights(
+            [self.kmeans.cluster_centers_]
         )
 
         print("[INFO] Done!  Starting the training.")
@@ -51,16 +53,17 @@ class CifarDeepClusterTrainer(BaseTrain):
 
             if ite % update_interval == 0:
             
-                batch = next(self.data.get_train_flow())
-                while len(batch) != batch_size:
-                    batch = next(self.data.get_train_flow())            
-                    q = self.model.predict(batch, verbose=0)
-                    p = self.clustering_target_distribution(q)
+                (x_batch, y_batch) = next(self.data.get_train_flow())
+                while len(x_batch) != self.config.data_loader.batch_size:
+                    (x_batch, y_batch) = next(self.data.get_train_flow())            
+
+                q = self.model.model.predict(x_batch, verbose=0)
+                p = self.clustering_target_distribution(q)
 
 
-            batch = next(self.data.get_train_flow())
-            if len(batch) == batch_size:
-                loss = self.model.train_on_batch(x=batch, y=p)
+            (x_batch, y_batch) = next(self.data.get_train_flow())
+            if len(x_batch) == self.config.data_loader.batch_size:
+                loss = self.model.model.train_on_batch(x=x_batch, y=p)
                 kld_loss.append(loss)
 
             print("[INFO] Epoch: {0}, Loss: {1:8.4f}".format(ite, loss))

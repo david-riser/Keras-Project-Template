@@ -20,14 +20,14 @@ def main():
         model = factory.create("models."+config.model.name)(config)
 
         print('Create the trainer')
-        trainer = factory.create("trainers."+config.trainer.name)(model.model, data_loader, config)
+        trainer = factory.create("trainers."+config.trainer.name)(model, data_loader, config)
         
         print('Loading evaluators')
         evaluators = []
         for evaluator in config.evaluators:
             evaluators.append(factory.create(
                 "evaluators." + evaluator.name
-            )(model.model, data_loader, evaluator))
+            )(model, data_loader, evaluator))
 
         print('Start training the model.')
         trainer.train()

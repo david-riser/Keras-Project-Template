@@ -27,7 +27,7 @@ class CifarModelTrainer(BaseTrain):
         )
 
     def train(self):
-        history = self.model.fit(
+        history = self.model.model.fit(
             x=self.data.get_train_flow(),
             validation_data=self.data.get_test_data(),
             epochs=self.config.trainer.num_epochs,
