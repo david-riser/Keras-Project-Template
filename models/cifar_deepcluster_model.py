@@ -14,7 +14,7 @@ class ClusteringLayer(Layer):
         self.n_clusters = n_clusters
         self.alpha = alpha
         self.initial_weights = weights
-
+        
     def build(self, input_shape):
         assert len(input_shape) == 2
         input_dim = input_shape[1]
@@ -58,6 +58,14 @@ class CifarDeepClusterModel(BaseModel):
             self.config.model.backbone
         ))
 
+        optimizer_builder = create("tensorflow.keras.optimizers.{}".format(
+            self.config.model.optimizer, 
+        ))
+        self.optimizer = optimizer_builder(
+            learning_rate=self.config.model.learning_rate,
+            momentum=self.config.model.momentum
+        )
+        
         print("[DEBUG] Building model.")
         self.build_model()
 
@@ -79,7 +87,7 @@ class CifarDeepClusterModel(BaseModel):
         self.model = Model(inputs=self.backbone.input, outputs=outputs)
         self.model.compile(
               loss='kld',
-              optimizer=self.config.model.optimizer
+              optimizer=self.optimizer
         )
 
         # Enable training of all the layers.
