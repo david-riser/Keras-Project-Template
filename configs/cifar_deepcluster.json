@@ -18,9 +18,9 @@
     "trainer":{
 	"name": "cifar_deepcluster_trainer.CifarDeepClusterTrainer",
 	"kmeans_epochs": 5,
-	"kmeans_batches_per_epoch": 16,
-	"batches":100,
-	"target_updates":20,
+	"kmeans_batches_per_epoch": 100,
+	"batches":8000,
+	"target_updates":35,
 	"verbose_training": true
     },
     "callbacks":{
