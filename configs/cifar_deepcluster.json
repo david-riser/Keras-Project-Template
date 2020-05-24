@@ -9,7 +9,7 @@
     },
     "model":{
 	"name": "cifar_deepcluster_model.CifarDeepClusterModel",
-	"learning_rate": 0.001,
+	"learning_rate": 0.0001,
 	"optimizer": "SGD",
 	"momentum":0.9,
 	"backbone": "resnet50.ResNet50",
@@ -19,9 +19,9 @@
     "trainer":{
 	"name": "cifar_deepcluster_trainer.CifarDeepClusterTrainer",
 	"kmeans_epochs": 1,
-	"kmeans_batches_per_epoch": 1000,
-	"batches_per_epoch":1000,
-	"epochs":20,
+	"kmeans_batches_per_epoch": 400,
+	"batches_per_epoch":100,
+	"epochs":3,
 	"verbose_training": true
     },
     "callbacks":{

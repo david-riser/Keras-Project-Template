@@ -22,6 +22,7 @@ class CifarDeepClusterTrainer(BaseTrain):
         #self.init_clusters_()        
 
         self.loss = []
+        self.ar_score = []
         print("[INFO] Starting the training.")
 
         # Train for some epochs and always do the kmeans first.
@@ -32,21 +33,29 @@ class CifarDeepClusterTrainer(BaseTrain):
             self.init_clusters_()
 
             batch_loss = []
+            batch_ar_score = []
             for batch in range(self.config.trainer.batches_per_epoch):
-                x_batch, _ = next(self.data.get_train_flow())
+                x_batch, y_true = next(self.data.get_train_flow())
                 y_batch = self.kmeans.predict(self.model.backbone.predict(x_batch))
                 batch_loss.append(self.model.model.train_on_batch(x_batch, y_batch))
-
-                print("[INFO] Epoch {0}, Batch {1}, Batch Loss {2:6.4f}".format(
-                    epoch, batch, batch_loss[-1]
+                batch_ar_score.append(adjusted_rand_score(
+                    y_true.reshape(-1,), np.argmax(
+                        self.model.model.predict(x_batch), axis=1)
                 ))
                 
-            print("[INFO] Epoch {0}, Batch Mean {1:6.3f}, Batch Std. {2:6.3f}".format(
+                print("[INFO] Epoch {0}, Batch {1}, Batch Loss {2:6.4f}, Batch ARI {3:6.4f}".format(
+                    epoch, batch, batch_loss[-1], batch_ar_score[-1]
+                ))
+                
+            print("[INFO] Epoch {0}, Loss {1:6.3f} +/- {2:6.3f}".format(
                 epoch, np.mean(batch_loss), np.std(batch_loss)
+            ))
+            print("[INFO] Epoch {0}, ARI {1:6.3f} +/- {2:6.3f}".format(
+                epoch, np.mean(batch_ar_score), np.std(batch_ar_score)
             ))
                 
             self.loss.append(np.mean(batch_loss))
-            
+            self.ar_score.append(np.mean(batch_ar_score))
 
         #update_interval = int(np.ceil(self.config.trainer.batches / self.config.trainer.target_updates))
         #if update_interval == 0:
@@ -91,7 +100,8 @@ class CifarDeepClusterTrainer(BaseTrain):
             print("[FATAL] Mini-batch KMeans requires a batch size at least as large as the number of clusters.")
             exit()
 
-        self.kmeans = MiniBatchKMeans(n_clusters=self.config.model.n_clusters)
+        self.kmeans = MiniBatchKMeans(n_clusters=self.config.model.n_clusters,
+                                      init='k-means++', reassignment_ratio=0.04)
 
         for epoch in range(self.config.trainer.kmeans_epochs):
             for batch in range(self.config.trainer.kmeans_batches_per_epoch):
