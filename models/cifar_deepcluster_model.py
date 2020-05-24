@@ -77,16 +77,20 @@ class CifarDeepClusterModel(BaseModel):
             include_top=False
         )
         print("[DEBUG] Setup backbone.")
-        outputs = ClusteringLayer(
-            n_clusters=self.config.model.n_clusters,
-            name='clustering_layer',
-            input_shape=(2048,))(self.backbone.output)
 
-        print("[DEBUG] Setup clustering layer.")
+        #outputs = ClusteringLayer(
+        #    n_clusters=self.config.model.n_clusters,
+        #    name='clustering_layer',
+        #    input_shape=(2048,))(self.backbone.output)
+        #print("[DEBUG] Setup clustering layer.")
+        outputs = Dense(10, activation='softmax')(
+            self.backbone.output
+        )
+        
         # Setup the clustering model.
         self.model = Model(inputs=self.backbone.input, outputs=outputs)
         self.model.compile(
-              loss='kld',
+              loss='sparse_categorical_crossentropy',
               optimizer=self.optimizer
         )
 
